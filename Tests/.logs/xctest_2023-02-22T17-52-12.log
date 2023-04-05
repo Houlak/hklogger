@@ -1,0 +1,5 @@
+[DEBUG] [DEFAULT] Testing Debug message^^^
+[DEBUG] [NETWORKING] [main] [HKLoggerFileTests.swift] [testDebugLogMessageWithMetaData()] [Line 164]: Testing Debug message with MetaData^^^
+[ERROR] [DEFAULT] Testing Error message^^^
+[INFO] [ANALYTICS] Testing Info message^^^
+[WARNING] [HEALTH] Testing Warning message^^^

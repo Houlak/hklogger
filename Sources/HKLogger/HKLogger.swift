@@ -204,7 +204,7 @@ internal extension HKLogger {
     ) -> String {
         return includeMetadataOnFile
             ? "\(timestamp)\(severity.prefix) \(type.prefix) \(createLogMessageWithMetada(from: message, fileName, functionName, lineNumber))\(endingCharacter)"
-            : "\(timestamp)\(severity.prefix) \(type.prefix) \(message)\(endingCharacter)"
+            : "\(timestamp)\(severity.prefix) \(type.prefix): \(message)\(endingCharacter)"
     }
     
     func createLogMessageWithMetada(

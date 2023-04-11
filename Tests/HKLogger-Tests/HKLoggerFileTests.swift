@@ -36,7 +36,7 @@ extension HKLoggerFileTests {
         
         do {
             let readText = try String(contentsOf: fileURL, encoding: .utf8)
-            XCTAssertEqual("[DEBUG] [DEFAULT] \(logMessage)\(logger.endingCharacter)\n", readText)
+            XCTAssertEqual("[DEBUG] [DEFAULT]: \(logMessage)\(logger.endingCharacter)\n", readText)
         } catch {
             XCTFail("Couldn't read file \(String(describing: fileURL.path))")
         }
@@ -52,7 +52,7 @@ extension HKLoggerFileTests {
         
         do {
             let readText = try String(contentsOf: fileURL, encoding: .utf8)
-            XCTAssertEqual("[INFO] [ANALYTICS] \(logMessage)\(logger.endingCharacter)\n", readText)
+            XCTAssertEqual("[INFO] [ANALYTICS]: \(logMessage)\(logger.endingCharacter)\n", readText)
         } catch {
             XCTFail("Couldn't read file \(String(describing: fileURL.path))")
         }
@@ -68,7 +68,7 @@ extension HKLoggerFileTests {
         
         do {
             let readText = try String(contentsOf: fileURL, encoding: .utf8)
-            XCTAssertEqual("[WARNING] [HEALTH] \(logMessage)\(logger.endingCharacter)\n", readText)
+            XCTAssertEqual("[WARNING] [HEALTH]: \(logMessage)\(logger.endingCharacter)\n", readText)
         } catch {
             XCTFail("Couldn't read file \(String(describing: fileURL.path))")
         }
@@ -85,7 +85,7 @@ extension HKLoggerFileTests {
         
         do {
             let readText = try String(contentsOf: fileURL, encoding: .utf8)
-            XCTAssertEqual("[ERROR] [DEFAULT] \(logMessage)\(logger.endingCharacter)\n", readText)
+            XCTAssertEqual("[ERROR] [DEFAULT]: \(logMessage)\(logger.endingCharacter)\n", readText)
         } catch {
             XCTFail("Couldn't read file \(String(describing: fileURL.path))")
         }
@@ -113,7 +113,7 @@ extension HKLoggerFileTests {
         
         do {
             let readText = try String(contentsOf: fileURL, encoding: .utf8)
-            XCTAssertEqual("[DEBUG] [DEFAULT] \(logMessage)\(logger.endingCharacter)\n", readText)
+            XCTAssertEqual("[DEBUG] [DEFAULT]: \(logMessage)\(logger.endingCharacter)\n", readText)
         } catch {
             XCTFail("Couldn't read file \(String(describing: fileURL.path))")
         }
@@ -157,7 +157,7 @@ extension HKLoggerFileTests {
     }
     
     func testGetLogMessageForFileWithMetaData() {
-        let logMessage = "Log message without MetaData\n"
+        let logMessage = "Log message with MetaData\n"
         let expectedValue = "[DEBUG] [DEFAULT] [main] [HKLoggerFileTests.swift] [testGetLogMessageForFileWithMetaData()] [Line 163]: \(logMessage)\(logger.endingCharacter)"
         logger.includeMetadataOnFile = true
         let receivedValue = logger.getLogMessageForFile(logMessage, .debug, .default, #file, #function, #line)
@@ -167,8 +167,8 @@ extension HKLoggerFileTests {
     }
     
     func testGetLogMessageForFileWithoutMetaData() {
-        let logMessage = "Log message with MetaData"
-        let expectedValue = "[DEBUG] [DEFAULT] \(logMessage)\(logger.endingCharacter)"
+        let logMessage = "Log message without MetaData"
+        let expectedValue = "[DEBUG] [DEFAULT]: \(logMessage)\(logger.endingCharacter)"
         logger.includeMetadataOnFile = false
         let receivedValue = logger.getLogMessageForFile(logMessage, .debug, .default, #file, #function, #line)
         XCTAssertEqual(expectedValue, receivedValue)

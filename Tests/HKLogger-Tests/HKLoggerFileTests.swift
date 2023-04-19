@@ -177,8 +177,14 @@ extension HKLoggerFileTests {
     func testDebugLogMessageWithMetaData() throws {
         logger.includeMetadataOnFile = true
         let logMessage = "Testing Debug message with MetaData"
-        let expectedValue = "[DEBUG] [NETWORKING] [main] [HKLoggerFileTests.swift] [testDebugLogMessageWithMetaData()] [Line 181]: \(logMessage)\(logger.endingCharacter)\n"
-        try logger.saveLogsToFileIfNeeded(logMessage, .debug, .networking)
+        let formattedMessage = getFormattedNetworkingMessage()
+        let expectedValue = "[DEBUG] [NETWORKING] [main] [HKLoggerFileTests.swift] [testDebugLogMessageWithMetaData()] [Line 183]: \(formattedMessage)\(logger.endingCharacter)\n"
+        let urlRequest = getURLRequest()
+        try logger.saveLogsToFileIfNeeded(logMessage, .debug, .networking(
+            request: urlRequest,
+            response: HTTPURLResponse(),
+            body: nil
+        ))
         
         let fileURL = URL(string: "\(logger.logsPath!)_1.log")!
         
@@ -267,5 +273,30 @@ private extension HKLoggerFileTests {
         if FileManager.default.fileExists(atPath: logFilePath) {
             try? FileManager.default.removeItem(atPath: logFilePath)
         }
+    }
+    
+    func getURLRequest() -> URLRequest {
+        let url = URL(string: "https://www.google.com")
+        return URLRequest(url: url!)
+    }
+    
+    // DO NOT CHANGE THE FORMAT OF THIS JSON OR IT WILL MAKE THE TEST FAIL
+    func getFormattedNetworkingMessage() -> String {
+        let formattedMessage = """
+        {
+      "path" : "https://www.google.com",
+      "method" : "GET",
+      "response" : {
+        "headers" : {
+
+        },
+        "statusCode" : 200
+      },
+      "request" : {
+
+      }
+    }
+    """
+        return formattedMessage.trimmingCharacters(in: .whitespaces)
     }
 }

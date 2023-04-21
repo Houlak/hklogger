@@ -37,16 +37,22 @@ extension KeyedEncodingContainerProtocol where Key == JSONCodingKeys {
 
 extension KeyedEncodingContainerProtocol {
     mutating func encode(_ value: [String: Any]?, forKey key: Key) throws {
-        if value != nil {
-            var container = self.nestedContainer(keyedBy: JSONCodingKeys.self, forKey: key)
-            try container.encode(value!)
+        guard let value = value
+        else {
+            throw EncodingError.invalidValue(value as Any, EncodingError.Context(codingPath: codingPath + [key], debugDescription: "Invalid JSON value"))
         }
+        
+        var container = self.nestedContainer(keyedBy: JSONCodingKeys.self, forKey: key)
+        try container.encode(value)
     }
-
+    
     mutating func encode(_ value: [Any]?, forKey key: Key) throws {
-        if value != nil {
-            var container = self.nestedUnkeyedContainer(forKey: key)
-            try container.encode(value!)
+        guard let value = value
+        else {
+            throw EncodingError.invalidValue(value as Any, EncodingError.Context(codingPath: codingPath + [key], debugDescription: "Invalid JSON value"))
         }
+        
+        var container = self.nestedUnkeyedContainer(forKey: key)
+        try container.encode(value)
     }
 }

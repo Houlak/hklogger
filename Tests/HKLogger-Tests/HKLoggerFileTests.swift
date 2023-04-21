@@ -183,7 +183,7 @@ extension HKLoggerFileTests {
         try logger.saveLogsToFileIfNeeded(logMessage, .debug, .networking(
             request: urlRequest,
             response: HTTPURLResponse(),
-            body: nil
+            responseBody: nil
         ))
         
         let fileURL = URL(string: "\(logger.logsPath!)_1.log")!
@@ -196,6 +196,28 @@ extension HKLoggerFileTests {
         }
         
         clearFiles()
+    }
+    
+    func testMessageGeneration() {
+        var type = HKLoggerType.networking(
+            request: getURLRequest(),
+            response: HTTPURLResponse(),
+            responseBody: nil
+        )
+        
+        XCTAssertEqual(type.message, getFormattedNetworkingMessage())
+        
+        type = .default
+        XCTAssertNil(type.message)
+        
+        type = .analytics
+        XCTAssertNil(type.message)
+        
+        type = .health
+        XCTAssertNil(type.message)
+        
+        type = .trace
+        XCTAssertNil(type.message)
     }
     
 }
@@ -287,13 +309,7 @@ private extension HKLoggerFileTests {
       "path" : "https://www.google.com",
       "method" : "GET",
       "response" : {
-        "headers" : {
-
-        },
         "statusCode" : 200
-      },
-      "request" : {
-
       }
     }
     """

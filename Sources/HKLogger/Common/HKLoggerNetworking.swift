@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct HKLoggerNetworking: Codable {
+internal struct HKLoggerNetworking: Codable {
     let method: String
     let path: String
-    let request: NetworkingRequest
-    let response: NetworkingResponse
+    let request: NetworkingRequest?
+    let response: NetworkingResponse?
     
     struct NetworkingRequest: Codable {
         let headers: [String: String]?
@@ -25,7 +25,7 @@ struct HKLoggerNetworking: Codable {
     }
 }
 
-enum JSONValue: Codable {
+internal enum JSONValue: Codable {
     case string(String)
     case number(Double)
     case bool(Bool)

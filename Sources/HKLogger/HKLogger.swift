@@ -135,7 +135,8 @@ internal extension HKLogger {
         _ functionName: StaticString = #function,
         _ lineNumber: Int = #line
     ) -> Bool {
-        let logMessage = getLogMessageForConsole(message, severity, type, fileName, functionName, lineNumber)
+        var formattedMessage = getFormattedMessageIfNeeded(for: type, message: message)
+        let logMessage = getLogMessageForConsole(formattedMessage, severity, type, fileName, functionName, lineNumber)
         switch environment {
         case .debug:
             print(logMessage)
@@ -161,7 +162,8 @@ internal extension HKLogger {
         
         
         do {
-            let logMessage = "\(getLogMessageForFile(message, severity, type, fileName, functionName, lineNumber))\n"
+            var formattedMessage = getFormattedMessageIfNeeded(for: type, message: message)
+            let logMessage = "\(getLogMessageForFile(formattedMessage, severity, type, fileName, functionName, lineNumber))\n"
             
             if saveLogsToFile {
                 try writeFile(in: logsPath, message: logMessage)
@@ -289,4 +291,12 @@ internal extension HKLogger {
         return lastIndex
     }
     
+    func getFormattedMessageIfNeeded(for type: HKLoggerType, message: String) -> String {
+        switch type {
+        case .networking:
+            return type.message ?? message
+        default:
+            return message
+        }
+    }
 }

@@ -72,24 +72,28 @@ let logger = HKLogger.shared
 logger.includeMetadataOnConsole = false
 logger.includeMetadataOnFile = true
 logger.environment = .debug
-logger.saveLogsToFile = truex
+logger.saveLogsToFile = true
 logger.logsDirectoryName = URL(string: "TestingLogs.log")
 ​
 do {
     try logger.log(message: "Testing \(logger.logsDirectoryName?.path)", severity: .info, type: .health)
 } catch let loggerError as HKLoggerError {
-   print(loggerError.debugMessage)
+    print(loggerError.debugMessage)
 } catch {
-   print(error)
+    print(error)
 }
 ```
+
+#### Save the logs file to the host's machine
 ​
+​In case you want to additionally save the logs in the host's machine, you have to define a few more settings:
 ```swift
-// If you want to save the logs file to the host's machine you will need to provide the full path
 logger.saveLogsToHost = true
 // Warning: The directory path must not contain any spaces!
 logger.hostLogsDirectory = URL(fileURLWithPath: #file).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent(".logs")
 ```
+
+Besides, if you are running your app on a physical device, it's mandatory to run the script in the `Scripts` folder **on the host Mac**. In order to run it, execute the following command in any console: `swift ClientScript.swift`. Due to the sandbox environment, it's necessary to establish a connection between the device and the host Mac itself.
 ​
 ## Contribution
-If you want to report a bug or need a new feature, open an issue from the issues tab
+If you want to report a bug or need a new feature, open an issue from the issues tab.

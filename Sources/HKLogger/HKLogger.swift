@@ -20,7 +20,13 @@ public final class HKLogger {
         }
     }
     /// Indicates if the logs need to be stored in the host file system
-    public var saveLogsToHost = false
+    public var saveLogsToHost = false {
+        didSet {
+            #if !targetEnvironment(simulator)
+                saveLogsInHostFromDevice = saveLogsToHost && environment == .debug
+            #endif
+        }
+    }
     /// Development logs directory
     public var hostLogsDirectory: URL?
     /// Current environment
@@ -56,9 +62,17 @@ public final class HKLogger {
         return hostLogsDirectory.appendingPathComponent(fileName)
     }
     
+    /// Save logs to host on a physical device
+    internal let hostServer = try? Server()
+    internal var saveLogsInHostFromDevice = false
+    
     // MARK: - Initialization
     
-    private init() {}
+    private init() {
+        #if !targetEnvironment(simulator)
+            hostServer?.start()
+        #endif
+    }
     
     /// Print the log message in console and/or add it to the logs file
     ///
@@ -116,16 +130,29 @@ internal extension HKLogger {
             
             if saveLogsToHost, let hostLogsDirectory = hostLogsDirectoryName {
                 let lastIndex = findLastFileIndex(for: hostLogsDirectory)
-                FileManager.default.createFile(atPath: "\(hostLogsDirectory.path)_\(lastIndex + 1).log", contents: nil)
+                let path = "\(hostLogsDirectory.path)_\(lastIndex + 1).log"
+                
+                #if targetEnvironment(simulator)
+                    FileManager.default.createFile(atPath: path, contents: nil)
+                #else
+                    let data = LogData(
+                        path: hostLogsDirectory.path,
+                        fileName: fileName,
+                        message: "",
+                        deviceInfo: logDeviceInfo ? getDeviceInfo() : nil,
+                        createNewFile: true
+                    )
+                    hostServer?.send(data)
+                #endif
             }
             
             logDeviceInfoIfNeeded()
-
+            
         } catch {
             throw HKLoggerError.couldNotSaveToFile(logMessage: error.localizedDescription)
         }
     }
-
+    
     @discardableResult
     func printMessageIfNeeded(
         _ message: String,
@@ -135,7 +162,7 @@ internal extension HKLogger {
         _ functionName: StaticString = #function,
         _ lineNumber: Int = #line
     ) -> Bool {
-        var formattedMessage = getFormattedMessageIfNeeded(for: type, message: message)
+        let formattedMessage = getFormattedMessageIfNeeded(for: type, message: message)
         let logMessage = getLogMessageForConsole(formattedMessage, severity, type, fileName, functionName, lineNumber)
         switch environment {
         case .debug:
@@ -160,9 +187,8 @@ internal extension HKLogger {
             return
         }
         
-        
         do {
-            var formattedMessage = getFormattedMessageIfNeeded(for: type, message: message)
+            let formattedMessage = getFormattedMessageIfNeeded(for: type, message: message)
             let logMessage = "\(getLogMessageForFile(formattedMessage, severity, type, fileName, functionName, lineNumber))\n"
             
             if saveLogsToFile {
@@ -170,7 +196,7 @@ internal extension HKLogger {
             }
             
             if saveLogsToHost, let hostLogsDirectory = hostLogsDirectoryName {
-                try writeFile(in: hostLogsDirectory, message: logMessage)
+                try writeFile(in: hostLogsDirectory, message: logMessage, saveOnHostFromDevice: saveLogsInHostFromDevice)
             }
             
         } catch {
@@ -219,10 +245,19 @@ internal extension HKLogger {
         return "[\(Thread.current.threadName)] [\(URL(fileURLWithPath: file).lastPathComponent)] [\(functionName)] [Line \(lineNumber)]: \(message)"
     }
     
-    func writeFile(in directory: URL, message: String) throws {
+    func writeFile(in directory: URL, message: String, saveOnHostFromDevice: Bool = false) throws {
         let currentFilePath = "\(directory.path)_\(findLastFileIndex(for: directory)).log"
         
-        if FileManager.default.fileExists(atPath: currentFilePath) {
+        if saveOnHostFromDevice {
+            let logData = LogData(
+                path: directory.path,
+                fileName: fileName,
+                message: message,
+                deviceInfo: logDeviceInfo ? getDeviceInfo() : nil
+            )
+            hostServer?.send(logData)
+            
+        } else if FileManager.default.fileExists(atPath: currentFilePath) {
             
             guard let url = URL(string: currentFilePath) else { return }
             let fh = try FileHandle(forWritingTo: url)
@@ -237,6 +272,7 @@ internal extension HKLogger {
             try content.write(toFile: logfilePath, atomically: true, encoding: .utf8)
         }
     }
+    
     
     func getDeviceInfo() -> String {
         let deviceModel = UIDevice.current.model
@@ -264,7 +300,7 @@ internal extension HKLogger {
             }
             
             if saveLogsToHost, let hostPath = hostLogsDirectoryName {
-                try? writeFile(in: hostPath, message: deviceInfo)
+                try? writeFile(in: hostPath, message: deviceInfo, saveOnHostFromDevice: saveLogsInHostFromDevice)
             }
         }
     }

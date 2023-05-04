@@ -93,7 +93,7 @@ logger.saveLogsToHost = true
 logger.hostLogsDirectory = URL(fileURLWithPath: #file).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent(".logs")
 ```
 
-Besides, if you are running your app on a physical device, it's mandatory to run the script in the `Scripts` folder **on the host Mac**. Due to the sandbox environment, it's necessary to establish a connection between the device and the host Mac itself.
+Besides, if you are running your app on a physical device, it's mandatory to run the script in the `Scripts` folder **on the host Mac**. In order to run it, execute the following command in any console: `swift ClientScript.swift`. Due to the sandbox environment, it's necessary to establish a connection between the device and the host Mac itself.
 ​
 ## Contribution
 If you want to report a bug or need a new feature, open an issue from the issues tab.

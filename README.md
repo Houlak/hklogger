@@ -42,9 +42,11 @@ As a companion tool to `HKLogger`, we are thrilled to present [Mate](https://git
 <img width="1093" alt="image" src="https://github.com/Houlak/hklogger/assets/20937316/9086189c-16b8-44b7-95ce-2b73679388a0">
 
 ## Getting Started
-Please read `Getting started guide` document.
+Please read [Getting started guide](https://houlak.github.io/hklogger/documentation/hklogger/gettingstarted) document.
 
 If you have any questions, feel free to post it in [Q&A](https://github.com/Houlak/hklogger/discussions/categories/q-a)
+
+[Full documentation](https://houlak.github.io/hklogger/documentation/hklogger)
 
 ## Installation
 ### SwiftPM

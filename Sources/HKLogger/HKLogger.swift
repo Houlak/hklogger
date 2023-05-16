@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 /**
  HKLogger
@@ -100,12 +102,14 @@ public final class HKLogger {
 public extension HKLogger {
     
     func configure() {
+        #if canImport(UIKit)
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleAppTerminated(_:)),
             name: UIApplication.willTerminateNotification,
             object: nil
         )
+        #endif
     }
     
 }
@@ -275,6 +279,7 @@ internal extension HKLogger {
     
     
     func getDeviceInfo() -> String {
+        #if canImport(UIKit)
         let deviceModel = UIDevice.current.model
         let deviceName = UIDevice.current.name
         let systemName = UIDevice.current.systemName
@@ -289,6 +294,9 @@ internal extension HKLogger {
         deviceInfo.append("**********************\n")
         
         return deviceInfo
+        #else
+        return ""
+        #endif
     }
     
     func logDeviceInfoIfNeeded() {

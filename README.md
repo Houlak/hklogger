@@ -56,4 +56,4 @@ In the Search or Enter Package URL search box enter this URL: https://github.com
 ## Contribution
 `HKLogger` is an open source project. We want to create the best logging tool for iOS developers. Any feedback is welcome.
 
-If you gound a bug or want to request a new feature, we highly encourage to do so by submitting an issue 👩‍💻👨‍💻
+If you found a bug or want to request a new feature, we highly encourage you to do so by submitting an issue 👩‍💻👨‍💻

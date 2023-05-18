@@ -101,6 +101,19 @@ public final class HKLogger {
             printMessageIfNeeded(error.localizedDescription, .error, .default, fileName, functionName, lineNumber)
         }
     }
+    
+    /// Start monitoring network requests and responses
+    public func startLoggingFromNetwork() -> URLSession? {
+        if URLProtocol.registerClass(HKLoggerUrlProtocol.self) {
+            let configuration = URLSessionConfiguration.default
+            configuration.protocolClasses = [HKLoggerUrlProtocol.self]
+            let session = URLSession(
+            return configuration
+        }
+        
+        return nil
+    }
+    
 }
 
 // MARK: - Life Cycle Config

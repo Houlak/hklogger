@@ -11,34 +11,32 @@ class HKLoggerUrlProtocol: URLProtocol {
     var session: URLSession?
     var sessionTask: URLSessionDataTask?
     
-    var response: HTTPURLResponse?
-    
-//    override init(request: URLRequest, cachedResponse: CachedURLResponse?, client: URLProtocolClient?) {
-//        super.init(request: request, cachedResponse: cachedResponse, client: client)
-//
-//        if session == nil {
-//            session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
-//        }
-//    }
-//
-//
-//    override class func canInit(with request: URLRequest) -> Bool {
-//        return true
-//    }
-//
-//    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-//        return request
-//    }
-//
-//    override func startLoading() {
-//        sessionTask = session?.dataTask(with: request as URLRequest)
-//        sessionTask?.resume()
-//    }
-//
-//    override func stopLoading() {
-//        sessionTask?.cancel()
-//        session?.invalidateAndCancel()
-//    }
+    override init(request: URLRequest, cachedResponse: CachedURLResponse?, client: URLProtocolClient?) {
+        super.init(request: request, cachedResponse: cachedResponse, client: client)
+
+        if session == nil {
+            session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        }
+    }
+
+
+    override class func canInit(with request: URLRequest) -> Bool {
+        return true
+    }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        return request
+    }
+
+    override func startLoading() {
+        sessionTask = session?.dataTask(with: request as URLRequest)
+        sessionTask?.resume()
+    }
+
+    override func stopLoading() {
+        sessionTask?.cancel()
+        session?.invalidateAndCancel()
+    }
 }
 
 extension HKLoggerUrlProtocol: URLSessionDataDelegate {

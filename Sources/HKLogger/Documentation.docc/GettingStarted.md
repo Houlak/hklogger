@@ -101,3 +101,12 @@ extension AppDelegate {
     }
 }
 ```
+If you wish HKLogger to log `URLRequest` and `HTTPURLResponse` automatically for you, then add the following flag and create a a `URLSession` using the given session configuration.
+
+```swift
+logger.includeNetworkLogs = true
+```
+
+```swift
+let session = URLSession(configuration: logger.sessionConfig ?? .default)
+```

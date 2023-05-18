@@ -12,7 +12,7 @@ public enum HKLoggerError: Error {
 
 public extension HKLoggerError {
     
-    /// Friendly message of the erro
+    /// Friendly message of the error
     var message: String {
         switch self {
         case .couldNotSaveToFile:

@@ -91,9 +91,15 @@ public final class HKLogger {
         fileName: StaticString = #file,
         functionName: StaticString = #function,
         lineNumber: Int = #line
-    ) throws {
+    ) {
         printMessageIfNeeded(message, severity, type, fileName, functionName, lineNumber)
-        try saveLogsToFileIfNeeded(message, severity, type, fileName, functionName, lineNumber)
+        do {
+            try saveLogsToFileIfNeeded(message, severity, type, fileName, functionName, lineNumber)
+        } catch let error as HKLoggerError {
+            printMessageIfNeeded(error.debugMessage, .error, .default, fileName, functionName, lineNumber)
+        } catch {
+            printMessageIfNeeded(error.localizedDescription, .error, .default, fileName, functionName, lineNumber)
+        }
     }
 }
 
@@ -120,41 +126,37 @@ internal extension HKLogger {
     
     /// Create a new log file representing a new session after the current has concluded
     @objc private func handleAppTerminated(_ notification: Notification) throws {
-        do {
-            try log(
-                message: "App execution has been terminated",
-                severity: .info,
-                type: .trace
-            )
-            
-            if saveLogsToFile, let logsPath = logsPath {
-                let lastIndex = findLastFileIndex(for: logsPath)
-                FileManager.default.createFile(atPath: "\(logsPath.path)_\(lastIndex + 1).log", contents: nil)
-            }
-            
-            if saveLogsToHost, let hostLogsDirectory = hostLogsDirectoryName {
-                let lastIndex = findLastFileIndex(for: hostLogsDirectory)
-                let path = "\(hostLogsDirectory.path)_\(lastIndex + 1).log"
-                
-                #if targetEnvironment(simulator)
-                    FileManager.default.createFile(atPath: path, contents: nil)
-                #else
-                    let data = LogData(
-                        path: hostLogsDirectory.path,
-                        fileName: fileName,
-                        message: "",
-                        deviceInfo: logDeviceInfo ? getDeviceInfo() : nil,
-                        createNewFile: true
-                    )
-                    hostServer?.send(data)
-                #endif
-            }
-            
-            logDeviceInfoIfNeeded()
-            
-        } catch {
-            throw HKLoggerError.couldNotSaveToFile(logMessage: error.localizedDescription)
+    
+        log(
+            message: "App execution has been terminated",
+            severity: .info,
+            type: .trace
+        )
+        
+        if saveLogsToFile, let logsPath = logsPath {
+            let lastIndex = findLastFileIndex(for: logsPath)
+            FileManager.default.createFile(atPath: "\(logsPath.path)_\(lastIndex + 1).log", contents: nil)
         }
+        
+        if saveLogsToHost, let hostLogsDirectory = hostLogsDirectoryName {
+            let lastIndex = findLastFileIndex(for: hostLogsDirectory)
+            let path = "\(hostLogsDirectory.path)_\(lastIndex + 1).log"
+            
+            #if targetEnvironment(simulator)
+                FileManager.default.createFile(atPath: path, contents: nil)
+            #else
+                let data = LogData(
+                    path: hostLogsDirectory.path,
+                    fileName: fileName,
+                    message: "",
+                    deviceInfo: logDeviceInfo ? getDeviceInfo() : nil,
+                    createNewFile: true
+                )
+                hostServer?.send(data)
+            #endif
+        }
+        
+        logDeviceInfoIfNeeded()
     }
     
     @discardableResult
@@ -320,9 +322,9 @@ internal extension HKLogger {
         var isDir: ObjCBool = true
         
         if fm.fileExists(atPath: directoryPath, isDirectory: &isDir) {
-            let files = try! fm.contentsOfDirectory(atPath: directoryPath)
+            let files = try? fm.contentsOfDirectory(atPath: directoryPath)
             
-            for name in files {
+            for name in files ?? [] {
                 if name.hasPrefix("\(fileName)_"),
                    let stringIndex = name.split(separator: "_").last?.prefix(while: { $0.isNumber }),
                    let index = Int(stringIndex),

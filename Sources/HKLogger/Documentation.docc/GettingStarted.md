@@ -29,7 +29,7 @@ final class Logger {
     private init() {}
 
     func logMessage(_ message: String) {
-        try? HKLogger.log(message: "Testing message", severity: .info, type: .default)
+        HKLogger.log(message: "Testing message", severity: .info, type: .default)
     }
 }
 ```
@@ -68,7 +68,7 @@ We recommenden using `deletingLastPathComponent()` built-in function.
 If you want to log a networking request, take adavantage of ``HKLoggerType/networking(request:response:responseBody:)``. `HKLogger` will format the request and response in a JSON format.
 
 ```swift
-try? HKLogger.shared.saveLogsToFileIfNeeded(
+HKLogger.shared.saveLogsToFileIfNeeded(
     logMessage, 
     .debug, 
     .networking(
@@ -85,9 +85,7 @@ import HKLogger
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        
         configureLogger()
-        
         return true
     }
 }

@@ -37,6 +37,16 @@ public final class HKLogger {
     public var includeMetadataOnConsole = false
     /// Indicates if the metadata should be included in the file's messages
     public var includeMetadataOnFile = false
+    ///Indicates if the logger should listen and generate messages based on requests and responses
+    public var includeNetworkLogs = false {
+        didSet {
+            setupNetworkLogs()
+        }
+    }
+    /// Returns the session configuration to be used on the URLSession. It's available only if `includeNetworkLogs` is active
+    public private(set) var sessionConfig: URLSessionConfiguration?
+    
+    
     
     // MARK: - Private properties
     internal var logDeviceInfo = true
@@ -207,6 +217,20 @@ internal extension HKLogger {
             
         } catch {
             throw HKLoggerError.couldNotSaveToFile(logMessage: error.localizedDescription)
+        }
+    }
+    
+    func setupNetworkLogs() {
+        guard includeNetworkLogs == true
+        else {
+            sessionConfig = nil
+            return
+        }
+        
+        if URLProtocol.registerClass(HKLoggerUrlProtocol.self) {
+            let configuration = URLSessionConfiguration.default
+            configuration.protocolClasses = [HKLoggerUrlProtocol.self]
+            sessionConfig = configuration
         }
     }
 }

@@ -37,7 +37,7 @@ public final class HKLogger {
     public var includeMetadataOnConsole = false
     /// Indicates if the metadata should be included in the file's messages
     public var includeMetadataOnFile = false
-    ///Indicates if the log should listen and generate messages based on requests and responses
+    ///Indicates if the logger should listen and generate messages based on requests and responses
     public var includeNetworkLogs = false {
         didSet {
             setupNetworkLogs()

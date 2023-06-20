@@ -86,30 +86,72 @@ public final class HKLogger {
         #endif
     }
     
-    /// Print the log message in console and/or add it to the logs file
+    /// Print a debug message in console and/or add it to the logs file
     ///
     /// - Parameters:
     ///     - message: The message to be logged
-    ///     - severity: The severity of the message (debug, info, warning, or error)
     ///     - fileName: The file where the log is generated
     ///     - funcionName: The function where the log is generated
     ///     - lineNumber: The line number where the log is generated
-    public func log(
+    public func debug(
         message: String,
-        severity: HKLoggerSeverityLevel,
         type: HKLoggerType = .default,
         fileName: StaticString = #file,
         functionName: StaticString = #function,
         lineNumber: Int = #line
-    ) {
-        printMessageIfNeeded(message, severity, type, fileName, functionName, lineNumber)
-        do {
-            try saveLogsToFileIfNeeded(message, severity, type, fileName, functionName, lineNumber)
-        } catch let error as HKLoggerError {
-            printMessageIfNeeded(error.debugMessage, .error, .default, fileName, functionName, lineNumber)
-        } catch {
-            printMessageIfNeeded(error.localizedDescription, .error, .default, fileName, functionName, lineNumber)
-        }
+    ){
+        log(message: message, severity: .debug, type: type, fileName: fileName, functionName: functionName)
+    }
+    
+    /// Print an info message in console and/or add it to the logs file
+    ///
+    /// - Parameters:
+    ///     - message: The message to be logged
+    ///     - fileName: The file where the log is generated
+    ///     - funcionName: The function where the log is generated
+    ///     - lineNumber: The line number where the log is generated
+    public func info(
+        message: String,
+        type: HKLoggerType = .default,
+        fileName: StaticString = #file,
+        functionName: StaticString = #function,
+        lineNumber: Int = #line
+    ){
+        log(message: message, severity: .info, type: type, fileName: fileName, functionName: functionName)
+    }
+    
+    /// Print a warning message in console and/or add it to the logs file
+    ///
+    /// - Parameters:
+    ///     - message: The message to be logged
+    ///     - fileName: The file where the log is generated
+    ///     - funcionName: The function where the log is generated
+    ///     - lineNumber: The line number where the log is generated
+    public func warning(
+        message: String,
+        type: HKLoggerType = .default,
+        fileName: StaticString = #file,
+        functionName: StaticString = #function,
+        lineNumber: Int = #line
+    ){
+        log(message: message, severity: .warning, type: type, fileName: fileName, functionName: functionName)
+    }
+    
+    /// Print an error message in console and/or add it to the logs file
+    ///
+    /// - Parameters:
+    ///     - message: The message to be logged
+    ///     - fileName: The file where the log is generated
+    ///     - funcionName: The function where the log is generated
+    ///     - lineNumber: The line number where the log is generated
+    public func error(
+        message: String,
+        type: HKLoggerType = .default,
+        fileName: StaticString = #file,
+        functionName: StaticString = #function,
+        lineNumber: Int = #line
+    ){
+        log(message: message, severity: .error, type: type, fileName: fileName, functionName: functionName)
     }
 }
 
@@ -133,6 +175,24 @@ public extension HKLogger {
 // MARK: - Auxiliar Functions
 
 internal extension HKLogger {
+    
+    func log(
+        message: String,
+        severity: HKLoggerSeverityLevel,
+        type: HKLoggerType = .default,
+        fileName: StaticString = #file,
+        functionName: StaticString = #function,
+        lineNumber: Int = #line
+    ) {
+        printMessageIfNeeded(message, severity, type, fileName, functionName, lineNumber)
+        do {
+            try saveLogsToFileIfNeeded(message, severity, type, fileName, functionName, lineNumber)
+        } catch let error as HKLoggerError {
+            printMessageIfNeeded(error.debugMessage, .error, .default, fileName, functionName, lineNumber)
+        } catch {
+            printMessageIfNeeded(error.localizedDescription, .error, .default, fileName, functionName, lineNumber)
+        }
+    }
     
     /// Create a new log file representing a new session after the current has concluded
     @objc private func handleAppTerminated(_ notification: Notification) throws {

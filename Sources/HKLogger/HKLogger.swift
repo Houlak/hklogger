@@ -82,7 +82,9 @@ public final class HKLogger {
     
     private init() {
         #if !targetEnvironment(simulator)
+        if saveLogsInHostFromDevice {
             hostServer?.start()
+        }
         #endif
     }
     
